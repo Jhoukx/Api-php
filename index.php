@@ -1,3 +1,95 @@
+<?php
+// error_reporting(0); 
+// ini_set('display_errors', 0);
+function validarValores ($array){
+    foreach ($array as $valor) {
+        if (empty($valor)) {
+            return false;
+        }
+    }
+    return true;
+}
+$url = "https://64828fa7f2e76ae1b95b4d7f.mockapi.io/usuarios";
+if(!empty($_POST)){
+        $nombre = "";
+        $apellido = "";
+        $edad = "";
+        $direccion = "";
+        $email = "";
+        $entrada = "";
+        $team = "";
+        $trainer = "";
+        $cedula = "";
+        if ($_POST['guardar'] === '✅') {
+            //METODO POST
+            $valores = [
+                "nombre" => $_POST["nombre"],
+                "apellido" => $_POST["apellido"],
+                "edad" => $_POST["edad"],
+                "direccion" => $_POST["direccion"],
+                "correoElectronico" => $_POST["email"],
+                "horaDeEntrada" => $_POST["hora"],
+                "team" => $_POST["team"],
+                "trainer" => $_POST["trainer"],
+                "cedula" => $_POST["cedula"]
+            ];
+            // Validar valores
+            if(validarValores($valores)){
+                $credenciales["http"]["header"] = "Content-type: application/json";
+                $credenciales["http"]["method"] = "POST";
+                $data = json_encode($valores);
+                $credenciales["http"]["content"] = $data;
+                $config = stream_context_create($credenciales);
+                $_DATAPOST = file_get_contents($url, false, $config);
+            }else{
+                echo "<h1>Envie TODOS los datos 😠🖕</h1>";
+            }
+        }elseif($_POST['eliminar'] === '❌'){
+            echo "*c eliminan los datos*";
+        }elseif($_POST['actualizar'] === '✏️'){
+            echo "*c actualizan los datos*";
+        }elseif($_POST['buscar'] === '🔎'){
+            //METODO GET
+            $_DATAGET = file_get_contents($url ."?cedula=". $_POST["cedula"]);  
+            echo "<h1>URL</h1>";
+            echo $url ."?cedula=". $_POST["cedula"];
+            $data = json_decode($_DATAGET,true);
+            $nombre = $data[0]['nombre'];
+            $apellido = $data[0]['apellido'];
+            $edad = $data[0]['edad'];
+            $direccion = $data[0]['direccion'];
+            $email = $data[0]['correoElectronico'];
+            $entrada = $data[0]['horaDeEntrada'];
+            $team = $data[0]['team'];
+            $trainer = $data[0]['trainer'];
+            $cedula = $data[0]['cedula'];
+        }elseif (!empty($_POST["cargar"])) {
+            //Valores a inputs
+            $_DATAGET = file_get_contents($url ."?cedula=". $_POST["cargar"]);  
+            echo "<h1>URL</h1>";
+            echo $url ."?cedula=". $_POST["cedula"];
+            $data = json_decode($_DATAGET,true);
+            $nombre = $data[0]['nombre'];
+            $apellido = $data[0]['apellido'];
+            $edad = $data[0]['edad'];
+            $direccion = $data[0]['direccion'];
+            $email = $data[0]['correoElectronico'];
+            $entrada = $data[0]['horaDeEntrada'];
+            $team = $data[0]['team'];
+            $trainer = $data[0]['trainer'];
+            $cedula = $data[0]['cedula'];
+
+        }
+    }else{
+    echo "Por favor, ingrese datos";
+}
+
+echo "<pre>";
+echo "<h2>DATA POST</h2>";
+var_dump($_POST);
+echo "</pre>";
+
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -14,12 +106,12 @@
 
 <body>
     <div class="container">
-        <form method="POST" action="./data.php" >
+        <form method="POST" action="">
             <nav>
                 <div class="col">
                     <div class="row">
                         <div class="col">
-                            <input type="text" class="form-control" placeholder="Nombre" name="nombre">
+                            <input type="text" class="form-control" placeholder="Nombre" name="nombre" value="<?php echo isset($nombre)?$nombre:""?>">
                         </div>
                         <div class="col">
                             <label for="">Campuslands</label>
@@ -27,18 +119,18 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            <input type="text" placeholder="Apellidos" name="apellido">
+                            <input type="text" placeholder="Apellidos" name="apellido" value="<?php echo isset($apellido)?$apellido:""?>">
                         </div>
                         <div class="col">
-                            <input type="number" placeholder="Edad" name="edad">
+                            <input type="number" placeholder="Edad" name="edad" value="<?php echo isset($edad)?$edad:""?>">
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
-                            <input type="text" name="direccion" placeholder="Direccion">
+                            <input type="text" name="direccion" placeholder="Direccion" value="<?php echo isset($direccion)?$direccion:""?>">
                         </div>
                         <div class="col">
-                            <input type="email" name="email" placeholder="Correo Electronico">
+                            <input type="email" name="email" placeholder="Correo Electronico" value="<?php echo isset($email)?$email:""?>">
                         </div>
                     </div>
                 </div>
@@ -47,7 +139,7 @@
                 <div class="row">
                     <div class="col">
                         <label for="">Hora de entrada</label><br>
-                        <input type="time" name="hora" id="">
+                        <input type="time" name="hora" id="" value="<?php echo isset($entrada)?$entrada:""?>">
                     </div>
                     <div class="col">
                         <div class="row">
@@ -62,7 +154,7 @@
                 </div>
                 <div class="row">
                     <div class="col">
-                        <input type="text" placeholder="Team" name="team" id="">
+                        <input type="text" placeholder="Team" name="team" id="" value="<?php echo isset($team)?$team:""?>">
                     </div>
                     <div class="col">
                         <div class="row">
@@ -77,10 +169,10 @@
                 </div>
                 <div class="row">
                     <div class="col">
-                        <input type="text" name="trainer" placeholder="Trainer" id="">
+                        <input type="text" name="trainer" placeholder="Trainer" id="" value="<?php echo isset($trainer)?$trainer:""?>">
                     </div>
                     <div class="col">
-                        <input type="text" name="cedula" placeholder="Cédula" id="">
+                        <input type="text" name="cedula" placeholder="Cédula" id="" value="<?php echo isset($cedula)?$cedula:""?>">
                     </div>
                 </div>
             </main>
@@ -99,16 +191,25 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Pepito</td>
-                            <td>Lopez</td>
-                            <td>asdas</td>
-                            <td>21</td>
-                            <td>jer@gmail.com</td>
-                            <td>2:50</td>
-                            <td>Sputnik</td>
-                            <td>Miguel</td>
-                        </tr>
+                        <?php
+                        $resGet = file_get_contents($url);
+                        $datosGet = json_decode($resGet,true);
+                        if(!empty($datosGet)){
+                            foreach($datosGet as $dato){
+                                echo "<tr>";
+                                echo "<td>".$dato["nombre"]."</td>";
+                                echo "<td>".$dato["apellido"]."</td>";
+                                echo "<td>".$dato["edad"]."</td>";
+                                echo "<td>".$dato["direccion"]."</td>";
+                                echo "<td>".$dato["correoElectronico"]."</td>";
+                                echo "<td>".$dato["team"]."</td>";
+                                echo "<td>".$dato["trainer"]."</td>";
+                                echo "<td>".$dato["horaDeEntrada"]."</td>";
+                                echo "<td><button type='submit' name='cargar' value='".$dato["cedula"]."'>⬆️</button></td>";
+                                echo "</tr>";
+                            }
+                        }
+                        ?>
                     </tbody>
                 </table>
             </footer>
