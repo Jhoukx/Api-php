@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,7 +14,7 @@
 
 <body>
     <div class="container">
-        <form action="POST">
+        <form method="POST" action="./data.php" >
             <nav>
                 <div class="col">
                     <div class="row">
