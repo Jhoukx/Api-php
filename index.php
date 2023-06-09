@@ -21,7 +21,7 @@ if(!empty($_POST)){
         $trainer = "";
         $cedula = "";
         if ($_POST['guardar'] === '✅') {
-            //METODO POST
+            // *METODO POST
             $valores = [
                 "nombre" => $_POST["nombre"],
                 "apellido" => $_POST["apellido"],
@@ -45,14 +45,40 @@ if(!empty($_POST)){
                 echo "<h1>Envie TODOS los datos 😠🖕</h1>";
             }
         }elseif($_POST['eliminar'] === '❌'){
-            echo "*c eliminan los datos*";
+            $credenciales["http"]["header"] = "Content-type: application/json";
+            $credenciales["http"]["method"] = "DELETE";
+            
+            $urlDELETE = $url . "/" . $_POST["id"];
+            $config = stream_context_create($credenciales);
+            $_DATADELETE = file_get_contents($urlDELETE, false, $config);
+            
         }elseif($_POST['actualizar'] === '✏️'){
+            // *METODO PUT
+            $valoresActualizados = [
+                "nombre" => $_POST["nombre"],
+                "apellido" => $_POST["apellido"],
+                "edad" => $_POST["edad"],
+                "direccion" => $_POST["direccion"],
+                "correoElectronico" => $_POST["email"],
+                "horaDeEntrada" => $_POST["hora"],
+                "team" => $_POST["team"],
+                "trainer" => $_POST["trainer"],
+                "cedula" => $_POST["cedula"]
+            ];
+
+            $data = json_encode($valoresActualizados);
+            $credenciales["http"]["header"] = "Content-type: application/json";
+            $credenciales["http"]["method"] = "PUT";
+            $credenciales["http"]["content"] = $data;
+            
+            $urlPUT = $url . "/" . $_POST["id"];
+            $config = stream_context_create($credenciales);
+            $_DATAPUT= file_get_contents($urlPUT,false,$config);
+
             echo "*c actualizan los datos*";
         }elseif($_POST['buscar'] === '🔎'){
-            //METODO GET
+            // *METODO GET
             $_DATAGET = file_get_contents($url ."?cedula=". $_POST["cedula"]);  
-            echo "<h1>URL</h1>";
-            echo $url ."?cedula=". $_POST["cedula"];
             $data = json_decode($_DATAGET,true);
             $nombre = $data[0]['nombre'];
             $apellido = $data[0]['apellido'];
@@ -63,6 +89,7 @@ if(!empty($_POST)){
             $team = $data[0]['team'];
             $trainer = $data[0]['trainer'];
             $cedula = $data[0]['cedula'];
+            $id = $data[0]["id"];
         }elseif (!empty($_POST["cargar"])) {
             //Valores a inputs
             $_DATAGET = file_get_contents($url ."?cedula=". $_POST["cargar"]);  
@@ -78,17 +105,11 @@ if(!empty($_POST)){
             $team = $data[0]['team'];
             $trainer = $data[0]['trainer'];
             $cedula = $data[0]['cedula'];
-
+            $id = $data[0]["id"];
         }
     }else{
     echo "Por favor, ingrese datos";
 }
-
-echo "<pre>";
-echo "<h2>DATA POST</h2>";
-var_dump($_POST);
-echo "</pre>";
-
 ?>
 
 <!DOCTYPE html>
@@ -173,6 +194,7 @@ echo "</pre>";
                     </div>
                     <div class="col">
                         <input type="text" name="cedula" placeholder="Cédula" id="" value="<?php echo isset($cedula)?$cedula:""?>">
+                        <input type="text" name="id" placeholder="id" id="" value="<?php echo isset($id)?$id:""?>" hidden>
                     </div>
                 </div>
             </main>
@@ -199,13 +221,14 @@ echo "</pre>";
                                 echo "<tr>";
                                 echo "<td>".$dato["nombre"]."</td>";
                                 echo "<td>".$dato["apellido"]."</td>";
-                                echo "<td>".$dato["edad"]."</td>";
                                 echo "<td>".$dato["direccion"]."</td>";
+                                echo "<td>".$dato["edad"]."</td>";
                                 echo "<td>".$dato["correoElectronico"]."</td>";
+                                echo "<td>".$dato["horaDeEntrada"]."</td>";
                                 echo "<td>".$dato["team"]."</td>";
                                 echo "<td>".$dato["trainer"]."</td>";
-                                echo "<td>".$dato["horaDeEntrada"]."</td>";
-                                echo "<td><button type='submit' name='cargar' value='".$dato["cedula"]."'>⬆️</button></td>";
+                                echo "<td ><button type='submit' name='cargar' value='".$dato["cedula"]."'>⬆️</button></td>";
+                                echo "<td hidden>".$dato["id"]."</td>";
                                 echo "</tr>";
                             }
                         }
